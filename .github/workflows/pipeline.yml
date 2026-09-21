@@ -80,8 +80,22 @@ jobs:
         run: |
           python -c "
           import os
-          from huggingface_hub import HfApi
+          from huggingface_hub import HfApi, create_repo
           api = HfApi(token=os.environ['HF_TOKEN'])
-          api.create_repo(repo_id='BenBlay/visit-with-us-app', repo_type='space', space_sdk='streamlit', exist_ok=True)
-          api.upload_folder(folder_path='tourism_project/deployment', repo_id='BenBlay/visit-with-us-app', repo_type='space')
+          repo_id = 'BenBlay/visit-with-us-app'
+          
+          # Create the space only if it doesn't exist
+          try:
+              api.create_repo(repo_id=repo_id, repo_type='space', space_sdk='streamlit', private=False)
+              print('New Space created.')
+          except Exception as e:
+              print('Space already exists or another issue occurred. Proceeding to upload.')
+
+          # Upload folder
+          api.upload_folder(
+              folder_path='tourism_project/deployment',
+              repo_id=repo_id,
+              repo_type='space'
+          )
+          print('Deployment successful to: https://huggingface.co/spaces/' + repo_id)
           "

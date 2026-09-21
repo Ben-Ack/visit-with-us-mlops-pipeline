@@ -79,8 +79,9 @@ jobs:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
           python -c "
-from huggingface_hub import HfApi
-api = HfApi(token='${{ secrets.HF_TOKEN }}')
-api.create_repo(repo_id='BenBlay/visit-with-us-app', repo_type='space', space_sdk='streamlit', exist_ok=True)
-api.upload_folder(folder_path='tourism_project/deployment', repo_id='BenBlay/visit-with-us-app', repo_type='space')
+          import os
+          from huggingface_hub import HfApi
+          api = HfApi(token=os.environ['HF_TOKEN'])
+          api.create_repo(repo_id='BenBlay/visit-with-us-app', repo_type='space', space_sdk='streamlit', exist_ok=True)
+          api.upload_folder(folder_path='tourism_project/deployment', repo_id='BenBlay/visit-with-us-app', repo_type='space')
           "

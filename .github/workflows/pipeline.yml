@@ -6,87 +6,56 @@ on:
       - main  # Automatically triggers on push to the main branch
 
 jobs:
+
   register-dataset:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
+      - uses: actions/checkout@v3
       - name: Install Dependencies
-        run: |
-          pip install pandas huggingface_hub datasets
+        run: <add_code_here>
       - name: Upload Dataset to Hugging Face Hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: python tourism_project/model_building/data_register.py
+        run: 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
 
   data-prep:
     needs: register-dataset
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
+      - uses: actions/checkout@v3
       - name: Install Dependencies
-        run: |
-          pip install pandas scikit-learn huggingface_hub
+        run: <add_code_here>
       - name: Run Data Preparation
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: python tourism_project/model_building/prep.py
+        run: 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
 
-  model-training:
+
+  model-traning:
     needs: data-prep
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
+      - uses: actions/checkout@v3
       - name: Install Dependencies
-        run: |
-          pip install pandas xgboost scikit-learn mlflow joblib huggingface_hub
+        run: <add_code_here>
       - name: Start MLflow Server
         run: |
-          mkdir -p mlruns
-          nohup mlflow ui --host 0.0.0.0 --port 5000 & 
-          sleep 5 
+          nohup mlflow ui --host 0.0.0.0 --port 5000 &  # Run MLflow UI in the background
+          sleep 5  # Wait for a moment to let the server starts
       - name: Model Building
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: python tourism_project/model_building/train.py
-      
-      # Important: This saves your performance tracking data so you can see it later
-      - name: Archive MLflow results
-        uses: actions/upload-artifact@v4
-        with:
-          name: mlflow-tracking-logs
-          path: mlruns/
+        run: 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
+
 
   deploy-hosting:
     runs-on: ubuntu-latest
-    needs: [model-training, data-prep, register-dataset]
+    needs: [model-traning,data-prep,register-dataset]
     steps:
-      - uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.9'
+      - uses: actions/checkout@v3
       - name: Install Dependencies
-        run: |
-          pip install huggingface_hub
+        run: <add_code_here>
       - name: Push files to Frontend Hugging Face Space
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
-        run: |
-          python -c "
-from huggingface_hub import HfApi
-api = HfApi(token='${{ secrets.HF_TOKEN }}')
-api.create_repo(repo_id='BenBlay/visit-with-us-app', repo_type='space', space_sdk='streamlit', exist_ok=True)
-api.upload_folder(folder_path='tourism_project/deployment', repo_id='BenBlay/visit-with-us-app', repo_type='space')
-          "
+        run: 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
